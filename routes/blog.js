@@ -36,50 +36,19 @@ if (!fs.existsSync(path.join(__dirname, '../data'))) {
 
 // Helper to get or generate blogs
 function getBlogs() {
-    if (!fs.existsSync(DATA_PATH)) {
-        // If the file doesn't exist, create it with the initial blogs
-        fs.writeFileSync(DATA_PATH, JSON.stringify(initialBlogs, null, 2));
+    if (fs.existsSync(DATA_PATH)) {
+        try {
+            const blogs = JSON.parse(fs.readFileSync(DATA_PATH, 'utf8'));
+            return blogs;
+        } catch (error) {
+            console.error("Error reading or parsing blogs.json:", error);
+            // If parsing fails, fall back to initial blogs
+            return initialBlogs;
+        }
+    } else {
+        // If the file doesn't exist, return the initial blogs
         return initialBlogs;
     }
-
-    let blogs = JSON.parse(fs.readFileSync(DATA_PATH, 'utf8'));
-
-    // Check if we need to generate a new blog for today
-    const today = new Date().toISOString().split('T')[0];
-    const hasToday = blogs.some(b => b.date.startsWith(today));
-
-    if (!hasToday && blogs.length < topics.length + 3) {
-        // Generate new blog from topics
-        const existingSlugs = new Set(blogs.map(b => b.slug));
-        const availableTopics = topics.filter(t => !existingSlugs.has(t.slug));
-
-        if (availableTopics.length > 0) {
-            const topic = availableTopics[0]; // Pick the first available topic
-            const newBlog = {
-                ...topic,
-                excerpt: `Discover why ${topic.title.toLowerCase()} is crucial for your digital security in 2026.`,
-                date: today,
-                author: "AgencyMail AI",
-                readTime: "4 min read",
-                content: `
-                    <h2>${topic.title}</h2>
-                    <p>In today's digital age, ${topic.title.toLowerCase()} is more relevant than ever. At AgencyMail, we believe in providing the tools you need to stay safe online.</p>
-                    <p>When you use a temporary email service, you're not just avoiding spam; you're actively protecting your digital footprint. This is especially important when considering ${topic.title.toLowerCase()}.</p>
-                    <h3>Key Benefits</h3>
-                    <ul>
-                        <li>Enhanced Security: Keep your primary data safe.</li>
-                        <li>Spam Prevention: Never deal with unwanted marketing again.</li>
-                        <li>Instant Access: Get your verification codes in seconds.</li>
-                    </ul>
-                    <p>We'll continue to update our platform to ensure you have the best experience possible. Stay tuned for more insights into ${topic.category.toLowerCase()} and digital privacy.</p>
-                `
-            };
-            blogs.unshift(newBlog);
-            fs.writeFileSync(DATA_PATH, JSON.stringify(blogs, null, 2));
-        }
-    }
-
-    return blogs;
 }
 
 // Initial 3 blogs (the ones the user requested)
