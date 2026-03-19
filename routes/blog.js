@@ -36,10 +36,13 @@ if (!fs.existsSync(path.join(__dirname, '../data'))) {
 
 // Helper to get or generate blogs
 function getBlogs() {
-    let blogs = [];
-    if (fs.existsSync(DATA_PATH)) {
-        blogs = JSON.parse(fs.readFileSync(DATA_PATH, 'utf8'));
+    if (!fs.existsSync(DATA_PATH)) {
+        // If the file doesn't exist, create it with the initial blogs
+        fs.writeFileSync(DATA_PATH, JSON.stringify(initialBlogs, null, 2));
+        return initialBlogs;
     }
+
+    let blogs = JSON.parse(fs.readFileSync(DATA_PATH, 'utf8'));
 
     // Check if we need to generate a new blog for today
     const today = new Date().toISOString().split('T')[0];
@@ -47,9 +50,11 @@ function getBlogs() {
 
     if (!hasToday && blogs.length < topics.length + 3) {
         // Generate new blog from topics
-        const nextTopicIndex = (blogs.length - 3) % topics.length;
-        if (nextTopicIndex >= 0) {
-            const topic = topics[nextTopicIndex];
+        const existingSlugs = new Set(blogs.map(b => b.slug));
+        const availableTopics = topics.filter(t => !existingSlugs.has(t.slug));
+
+        if (availableTopics.length > 0) {
+            const topic = availableTopics[0]; // Pick the first available topic
             const newBlog = {
                 ...topic,
                 excerpt: `Discover why ${topic.title.toLowerCase()} is crucial for your digital security in 2026.`,
