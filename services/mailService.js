@@ -5,7 +5,7 @@ const MAIL_TM_API = 'https://api.mail.tm';
 const MAIL_GW_API = 'https://api.mail.gw';
 const SEC_MAIL_API = 'https://www.1secmail.com/api/v1/';
 const DROPMAIL_API = 'https://dropmail.me/api/graphql';
-const DROPMAIL_TOKEN = 'af_AQVpuh1FAQVsJnTBSfmcQFFiyMfBqvqvINCqNfhL';
+const DROPMAIL_TOKEN = 'af_AQVp0bVEih1QFGYtRdmr43o0FqCZaxXBrtB93QCR';
 
 // Helper to clean up DropMail sender address and show website name
 const cleanDropMailSender = (fromAddr, subject = '') => {
